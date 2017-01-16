@@ -12,7 +12,7 @@ Object.assign(Stack.prototype, {
   },
 
   peek () {
-    return this.stack[this.stack.length]
+    return this.stack[this.stack.length - 1]
   },
 
   length () {
