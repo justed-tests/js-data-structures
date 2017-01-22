@@ -39,6 +39,165 @@ Object.assign(BinarySearchTree.prototype, {
     }
   },
 
+  remove (data) {
+    const removeNode = (node, data) => {
+      if (!node) return null
+
+      if (data === node.data) {
+        if (!node.left && !node.right) return null
+        if (!node.left) return node.right
+        if (!node.right) return node.left
+
+        let temp = this.getMin(node.right)
+        node.data = temp
+        node.right = removeNode(node.right, temp)
+        return node
+      } else if (data < node.data) {
+        node.left = removeNode(node.left, data)
+        return node
+      } else {
+        node.right = removeNode(node.right, data)
+        return node
+      }
+    }
+
+    this.root = removeNode(this.root, data)
+  },
+
+  contains (data) {
+    let current = this.root
+
+    while (current) {
+      if (data === current.data) return true
+      if (data < current.data) {
+        current = current.left
+      } else {
+        current = current.right
+      }
+    }
+
+    return false
+  },
+
+  _preOrder (node, fn) {
+    if (!node) return
+
+    if (fn) fn(node)
+    this._preOrder(node.left, fn)
+    this._preOrder(node.right, fn)
+  },
+
+  _inOrder (node, fn) {
+    if (!node) return
+
+    this._inOrder(node.left, fn)
+    if (fn) fn(node)
+    this._inOrder(node.right, fn)
+  },
+
+  _postOrder (node, fn) {
+    if (!node) return
+
+    this._postOrder(node.left, fn)
+    this._postOrder(node.right, fn)
+    if (fn) fn(node)
+  },
+
+  traverseDFS (fn, method) {
+    let current = this.root
+    if (method) {
+      this['_' + method](current, fn)
+    } else {
+      this._preOrder(current, fn)
+    }
+  },
+
+  traverseBFS (fn) {
+    this.queue = [this.root]
+
+    while (this.queue.length) {
+      let node = this.queue.shift()
+      if (fn) fn(node)
+      if (node.left) this.queue.push(node.left)
+      if (node.right) this.queue.push(node.right)
+    }
+  },
+
+  getMin (node) {
+    if (!node) node = this.root
+    while (node.left) node = node.left
+    return node.data
+  },
+
+  getMax (node) {
+    if (!node) node = this.root
+    while (node.right) node = node.right
+    return node.data
+  },
+
+  getHeight (node) {
+    if (!node) node = this.root
+    return this._getHeight(node)
+  },
+
+  _getHeight (node) {
+    if (!node) return -1
+
+    let left = this._getHeight(node.left)
+    let right = this._getHeight(node.right)
+
+    return Math.max(left, right) + 1
+  },
+
+  isBalanced (node) {
+    if (!node) node = this.root
+
+    return this._isBalanced(node)
+  },
+
+  _isBalanced (node) {
+    if (!node) return true
+
+    let heightLeft = this._getHeight(node.left)
+    let heightRight = this._getHeight(node.right)
+    let diff = Math.abs(heightLeft - heightRight)
+
+    if (diff > 1) {
+      return false
+    } else {
+      return this._isBalanced(node.left) && this._isBalanced(node.right)
+    }
+  },
+
+  isBalancedOptimized (node) {
+    if (!node) node = this.root
+
+    if (!node) return true
+
+    if (this._checkHeight(node) === -1) {
+      return false
+    } else {
+      return true
+    }
+  },
+
+  _checkHeight (node) {
+    if (!node) return 0
+
+    let left = this._checkHeight(node.left)
+    if (left === -1) return -1
+
+    let right = this._checkHeight(node.rigth)
+    if (right === -1) return -1
+
+    let diff = Math.abs(left - right)
+    if (diff > 1) {
+      return -1
+    } else {
+      return Math.max(left, right) + 1
+    }
+  },
+
   print () {
     if (this.root === null) return console.log('No root node found')
 
